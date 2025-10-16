@@ -1,0 +1,25 @@
+{
+  "name": "mcy_web",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aceplace/MCY_Web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aceplace/MCY_Web/issues"
+  },
+  "homepage": "https://github.com/Aceplace/MCY_Web#readme",
+  "description": "",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
