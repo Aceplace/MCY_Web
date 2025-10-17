@@ -1,5 +1,5 @@
 export function hello(): string {
-    return "Hello, world!";
+    return "Hello galaxy!";
 }
 
 export interface Person {
