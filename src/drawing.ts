@@ -1,43 +1,111 @@
 import {V2} from "./math";
 
-export class Rect
+export enum RectAlign
 {
-    pos: V2 = {x: 0, y: 0};
-    dim: V2 = {x: 0, y: 0};
+    NONE,
+    LEFT_BOTTOM,
+    LEFT_MIDDLE,
+    LEFT_TOP,
+    CENTER_TOP,
+    CENTER_BOTTOM,
+    RIGHT_BOTTOM,
+    RIGHT_MIDDLE,
+    RIGHT_TOP,
+    CENTER_MIDDLE
 
-    clone(): Rect
-    {
-        let result: Rect = new Rect();
-
-        result.pos.x = this.pos.x;
-        result.pos.y = this.pos.y;
-        result.dim.x = this.dim.x;
-        result.dim.y = this.dim.y;
-
-        return result;
-    }
-
-    WithPos(pos: V2): Rect
-    {
-        let result: Rect = new Rect();
-
-        result.pos.x = pos.x;
-        result.pos.y = pos.y;
-        result.dim.x = this.dim.x;
-        result.dim.y = this.dim.y;
-
-        return result;
-    }
 }
 
-export function PositionInBounds(pos: V2, bounds: Rect): boolean
+export type Rect =
 {
-    let result = pos.x >= bounds.pos.x && pos.x <= bounds.pos.x + bounds.dim.x
-        && pos.y >= bounds.pos.y && pos.y <= bounds.pos.y + bounds.dim.y;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    align: RectAlign;
+}
+
+export function RectClone(rect: Rect): Rect
+{
+    let result: Rect = {
+        x: rect.x,
+        y: rect.y,
+        w: rect.w,
+        h: rect.h,
+        align: rect.align,
+    }
+
     return result;
 }
 
-export function DebugDrawBoundingBoxInRecursion(ctx: CanvasRenderingContext2D, pos: V2, w: number, h: number, level: number, showLevel0: boolean = true)
+export function RectCloneWithPos(rect: Rect, x: number, y: number): Rect
+{
+    let result: Rect = {
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0,
+        align: rect.align,
+    }
+
+    return result;
+}
+
+export function DrawRect(ctx: CanvasRenderingContext2D, rect: Rect): void
+{
+    const adjustedRect = RectNormalizded(rect);
+    ctx.fillRect(adjustedRect.x, adjustedRect.y, adjustedRect.w, adjustedRect.h);
+}
+
+export function RectNormalizded(rect: Rect) : Rect
+{
+    let result = RectClone(rect);
+    switch (result.align)
+    {
+        case RectAlign.NONE:
+            break;
+        case RectAlign.LEFT_BOTTOM:
+            rect.y -= rect.h;
+            break;
+        case RectAlign.LEFT_MIDDLE:
+            rect.y -= rect.h / 2;
+            break;
+        case RectAlign.LEFT_TOP:
+            break;
+        case RectAlign.CENTER_TOP:
+            rect.x -= rect.w / 2;
+            break;
+        case RectAlign.CENTER_BOTTOM:
+            rect.x -= rect.w / 2;
+            rect.y -= rect.h;
+            break;
+        case RectAlign.RIGHT_BOTTOM:
+            rect.x -= rect.w;
+            rect.y -= rect.h;
+            break;
+        case RectAlign.RIGHT_MIDDLE:
+            rect.x -= rect.w;
+            rect.y -= rect.h / 2;
+            break;
+        case RectAlign.RIGHT_TOP:
+            rect.x -= rect.w;
+            break;
+        case RectAlign.CENTER_MIDDLE:
+            rect.x -= rect.w / 2;
+            rect.y -= rect.h / 2;
+            break;
+    }
+    rect.align = RectAlign.LEFT_TOP;
+    return result;
+}
+
+export function PositionInRectBounds(pos: V2, rect: Rect): boolean
+{
+    let result = pos.x >= rect.x && pos.x <= rect.x + rect.x
+        && pos.y >= rect.y && pos.y <= rect.y + rect.y;
+    return result;
+}
+
+export function DebugDrawBoundingBoxInRecursion(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, level: number, showLevel0: boolean = true)
 {
     if (level == 0 && !showLevel0)
         return;
@@ -54,7 +122,7 @@ export function DebugDrawBoundingBoxInRecursion(ctx: CanvasRenderingContext2D, p
     else
         ctx.strokeStyle = "purple";
 
-    ctx.strokeRect(pos.x, pos.y, w, h);
+    ctx.strokeRect(x, y, w, h);
     ctx.restore();
 }
 
@@ -63,7 +131,7 @@ export function DebugDrawBounds(ctx: CanvasRenderingContext2D, bounds: Rect, col
     ctx.save();
     ctx.strokeStyle = color;
 
-    ctx.strokeRect(bounds.pos.x, bounds.pos.y, bounds.dim.x, bounds.dim.y);
+    ctx.strokeRect(bounds.x, bounds.y, bounds.w, bounds.h);
     ctx.restore();
 }
 
@@ -90,47 +158,7 @@ export function FillBoundingRect(ctx: CanvasRenderingContext2D, bounds: Rect, co
 {
     ctx.save();
     ctx.fillStyle = color;
-    ctx.fillRect(bounds.pos.x, bounds.pos.y, bounds.dim.x, bounds.dim.y);
-    ctx.restore();
-}
-
-export function DrawParentheses(ctx: CanvasRenderingContext2D, leftBox: Rect, rightBox: Rect)
-{
-    const PARENTHESIS_X_OFFSET_ONE: number = 1.1;
-    const PARENTHESIS_X_OFFSET_TWO: number = 1.8;
-    const PARENTHESIS_X_OFFSET_THRESHOLD: number = 70;
-
-    function drawParenthesis(x: number, y: number, width: number, height: number, direction: string)
-    {
-        let controlOffsetX: number = width * PARENTHESIS_X_OFFSET_ONE;
-        if (height > PARENTHESIS_X_OFFSET_THRESHOLD)
-            controlOffsetX = width * PARENTHESIS_X_OFFSET_TWO;
-        const controlOffsetY: number = height * 0.1;
-
-        ctx.beginPath();
-        if (direction === "left") {
-            ctx.moveTo(x + controlOffsetX, y);
-            ctx.bezierCurveTo(
-                x, y + controlOffsetY,
-                x, y + height - controlOffsetY,
-                x + controlOffsetX, y + height
-            );
-        } else {
-            ctx.moveTo(x + width - controlOffsetX, y);
-            ctx.bezierCurveTo(
-                x + width, y + controlOffsetY,
-                x + width, y + height - controlOffsetY,
-                x + width - controlOffsetX, y + height
-            );
-        }
-        ctx.stroke();
-    }
-
-    ctx.save();
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = 'black';
-    drawParenthesis(leftBox.pos.x, leftBox.pos.y, leftBox.dim.x, leftBox.dim.y, "left");
-    drawParenthesis(rightBox.pos.x, rightBox.pos.y, rightBox.dim.x, rightBox.dim.y, "right");
+    ctx.fillRect(bounds.x, bounds.y, bounds.x, bounds.y);
     ctx.restore();
 }
 
