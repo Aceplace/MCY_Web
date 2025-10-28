@@ -1,4 +1,4 @@
-import {V2} from "./math";
+import {V2} from "../core/math";
 
 export enum KeyCode
 {

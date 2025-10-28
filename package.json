@@ -1,7 +1,11 @@
 {
   "name": "mcy_web",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/core/core.js",
+    "./app": "./dist/app/app.js",
+    "./backend": "./dist/backend.js"
+  },
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",

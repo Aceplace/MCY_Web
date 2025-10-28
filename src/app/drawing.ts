@@ -1,4 +1,4 @@
-import {V2} from "./math";
+import {V2} from "../core/math";
 
 export enum RectAlign
 {
@@ -209,3 +209,10 @@ export function DrawLineArrow(
     ctx.restore();
 }
 
+export class DrawingException extends Error
+{
+    constructor(message: string) {
+        super(message);
+        this.name = "DrawException";
+    }
+}

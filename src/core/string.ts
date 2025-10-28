@@ -12,21 +12,7 @@ export function EscapeRegex(str: string): string
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export class ParseException extends Error
-{
-    constructor(message: string) {
-        super(message);
-        this.name = "ParseException";
-    }
-}
 
-export class DrawingException extends Error
-{
-    constructor(message: string) {
-        super(message);
-        this.name = "DrawException";
-    }
-}
 
 export function CharIsAlphanumeric(char: string): boolean
 {
