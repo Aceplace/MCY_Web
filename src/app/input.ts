@@ -73,7 +73,7 @@ export enum KeyCode
     Plus = "+",
 }
 
-const KeyKeyCodeMap =
+export const KeyKeyCodeMap =
 {
     "a" : 0,
     "b" : 1,
@@ -146,7 +146,7 @@ const KeyKeyCodeMap =
     "+": 68,
 }
 
-class InputClass
+export class InputClass
 {
     keysDown: Set<string> = new Set();
     keysDownThisFrame: Array<string> = [];
@@ -259,4 +259,4 @@ class InputClass
     }
 }
 
-export const Input = new InputClass();
+export const InputWin = new InputClass();
