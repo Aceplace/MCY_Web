@@ -1,10 +1,10 @@
-// demo/vite.config.js
+// frontend_demo/vite.config.js
 import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
 import path from "path";
 
 export default defineConfig({
-    root: path.resolve(__dirname, "."), // demo folder is the root
+    root: path.resolve(__dirname, "."), // frontend_demo folder is the root
     server: {
         port: 5173,
         open: true,

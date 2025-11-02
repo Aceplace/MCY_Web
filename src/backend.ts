@@ -13,3 +13,16 @@ export function MakeResponse<T>(res: express.Response, statusCode: number, succe
         success, message, data
     });
 }
+
+
+import mongoose from "mongoose";
+
+export interface BaseUser {
+    username: string;
+    passwordHash: string;
+    hasSetPassword: boolean;
+    email: string;
+    firstName: string;
+    lastName: string;
+    roles?: string[];       // Optional for role-based access
+}

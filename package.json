@@ -23,7 +23,7 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "dev": "vite --config demo/vite.config.js"
+    "dev": "vite --config frontend_demo/vite.config.js"
   },
   "repository": {
     "type": "git",
