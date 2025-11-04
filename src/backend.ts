@@ -28,7 +28,7 @@ export async function ConnectToDB(uri: string): Promise<void>
     }
 }
 
-function basic_error_handler(err: any, req: express.Request, res: express.Response, next: express.NextFunction)
+export function BasicErrorHandler(err: any, req: express.Request, res: express.Response, next: express.NextFunction)
 {
     if (err instanceof Error)
     {
