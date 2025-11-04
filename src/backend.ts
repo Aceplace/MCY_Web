@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from "mongoose";
 
 export type NetworkResponse<T> =
 {
@@ -14,15 +15,29 @@ export function MakeResponse<T>(res: express.Response, statusCode: number, succe
     });
 }
 
+export async function ConnectToDB(uri: string): Promise<void>
+{
+    try
+    {
+        await mongoose.connect(uri!);
+        console.log("Connected to database...");
+    }
+    catch(err)
+    {
+        console.error("Database connection error:", err);
+    }
+}
 
-import mongoose from "mongoose";
-
-export interface BaseUser {
-    username: string;
-    passwordHash: string;
-    hasSetPassword: boolean;
-    email: string;
-    firstName: string;
-    lastName: string;
-    roles?: string[];       // Optional for role-based access
+function basic_error_handler(err: any, req: express.Request, res: express.Response, next: express.NextFunction)
+{
+    if (err instanceof Error)
+    {
+        // res.status(400).json({ message: err.message, callStack: err.stack });
+        MakeResponse<string>(res, 400, false, err.message, err.stack);
+    }
+    else
+    {
+        // res.status(400).json({ message: 'unknown error', callStack: err.stack });
+        MakeResponse<string>(res, 400, false, 'unknown error', err.stack);
+    }
 }
