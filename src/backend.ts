@@ -52,7 +52,7 @@ export const backEndConfig =
     basePath: '',
 }
 
-export async function FetchPostRequest<t_req, t_res>(endpoint: string, request: t_req, errorMsg: string): Promise<t_res>
+export async function FetchPostRequest<t_req, t_res>(endpoint: string, errorMsg: string, request: t_req): Promise<t_res>
 {
     const fullRoute = backEndConfig.basePath + "/" + endpoint;
 
