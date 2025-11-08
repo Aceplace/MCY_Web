@@ -41,3 +41,59 @@ export function BasicErrorHandler(err: any, req: express.Request, res: express.R
         MakeResponse<string>(res, 400, false, 'unknown error', err.stack);
     }
 }
+
+export type BackEndConfig =
+{
+    basePath: string;
+}
+
+export const backEndConfig =
+{
+    basePath: '',
+}
+
+export async function FetchPostRequest<t_req, t_res>(endpoint: string, request: t_req, errorMsg: string): Promise<t_res>
+{
+    const fullRoute = backEndConfig.basePath + "/" + endpoint;
+
+    const response = await fetch(fullRoute,
+    {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(request)
+    });
+
+    const networkResponse: NetworkResponse<t_res> = await response.json();
+
+    if (!networkResponse.success)
+        throw new Error('errorMsg: ' + networkResponse.message);
+
+    return networkResponse.data!;
+}
+
+export async function SimpleGetRequest<t_res>(endpoint: string, errorMsg: string): Promise<t_res>
+{
+    const fullRoute = backEndConfig.basePath + "/" + endpoint;
+
+    const response = await fetch('/api/studentProgress/getAllStudentProgress',
+    {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    const networkResponse: NetworkResponse<t_res> = await response.json();
+
+    if (!networkResponse.success)
+        throw new Error('errorMsg: ' + networkResponse.message);
+
+    return networkResponse.data!;
+}
+
+
+
