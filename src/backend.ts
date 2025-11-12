@@ -78,7 +78,7 @@ export async function SimpleGetRequest<t_res>(endpoint: string, errorMsg: string
 {
     const fullRoute = backEndConfig.basePath + endpoint;
 
-    const response = await fetch('/api/studentProgress/getAllStudentProgress',
+    const response = await fetch(fullRoute,
     {
         method: 'GET',
         credentials: 'include',
