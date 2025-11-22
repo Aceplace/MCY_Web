@@ -1,11 +1,38 @@
-import express from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import mongoose from "mongoose";
+
+export enum HttpStatusCodeType
+{
+    OK = 200,
+    CREATED = 201,
+    NO_CONTENT = 204,
+    BAD_REQUEST = 400,
+    UNAUTHORIZED = 401,
+    FORBIDDEN = 403,
+    NOT_FOUND = 404,
+    CONFLICT = 409,
+    UNPROCESSABLE_ENTITY = 422,
+    INTERNAL_SERVER_ERROR = 500,
+    SERVICE_UNAVAILABLE = 503,
+}
 
 export type NetworkResponse<T> =
 {
-    success: boolean;
+    statusCode: HttpStatusCodeType;
     message: string;
     data?: T;
+}
+
+export function SuccessCode(statusCode: HttpStatusCodeType)
+{
+    switch (statusCode)
+    {
+        case HttpStatusCodeType.OK:
+        case HttpStatusCodeType.CREATED:
+        case HttpStatusCodeType.NO_CONTENT:
+            return true;
+    }
+    return false;
 }
 
 export function MakeResponse<T>(res: express.Response, statusCode: number, success: boolean, message: string, data?: T)
@@ -52,7 +79,7 @@ export const backEndConfig =
     basePath: '',
 }
 
-export async function FetchPostRequest<t_req, t_res>(endpoint: string, errorMsg: string, request: t_req): Promise<t_res>
+export async function FetchPostRequest<t_req, t_res>(endpoint: string, errorMsg: string, request: t_req): Promise<NetworkResponse<t_res>>
 {
     const fullRoute = backEndConfig.basePath + endpoint;
 
@@ -66,15 +93,15 @@ export async function FetchPostRequest<t_req, t_res>(endpoint: string, errorMsg:
         body: JSON.stringify(request)
     });
 
-    const networkResponse: NetworkResponse<t_res> = await response.json();
-
-    if (!networkResponse.success)
-        throw new Error('errorMsg: ' + networkResponse.message);
-
-    return networkResponse.data!;
+    const result: NetworkResponse<t_res> = await response.json();
+    return result;
+    // if (!networkResponse.success)
+    //     throw new Error('errorMsg: ' + networkResponse.message);
+    //
+    // return networkResponse.data!;
 }
 
-export async function SimpleGetRequest<t_res>(endpoint: string, errorMsg: string): Promise<t_res>
+export async function SimpleGetRequest<t_res>(endpoint: string, errorMsg: string): Promise<NetworkResponse<t_res>>
 {
     const fullRoute = backEndConfig.basePath + endpoint;
 
@@ -87,10 +114,17 @@ export async function SimpleGetRequest<t_res>(endpoint: string, errorMsg: string
         },
     });
 
-    const networkResponse: NetworkResponse<t_res> = await response.json();
+    const result: NetworkResponse<t_res> = await response.json();
+    return result;
 
-    if (!networkResponse.success)
-        throw new Error('errorMsg: ' + networkResponse.message);
+    // if (!networkResponse.success)
+    //     throw new Error('errorMsg: ' + networkResponse.message);
 
-    return networkResponse.data!;
+    // return networkResponse.data!;
 }
+
+export const ErrorHandlerWrapper = (fn: RequestHandler) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        Promise.resolve(fn(req, res, next)).catch(next);
+    };
+};
