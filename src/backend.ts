@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import express from 'express';
 import mongoose from "mongoose";
 
 export enum HttpStatusCodeType
@@ -123,8 +123,8 @@ export async function SimpleGetRequest<t_res>(endpoint: string, errorMsg: string
     // return networkResponse.data!;
 }
 
-export const ErrorHandlerWrapper = (fn: RequestHandler) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+export const ErrorHandlerWrapper = (fn: express.RequestHandler) => {
+    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
         Promise.resolve(fn(req, res, next)).catch(next);
     };
 };
