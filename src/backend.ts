@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from "mongoose";
+import {STATUS_CODES} from "node:http";
 
 export enum HttpStatusCodeType
 {
@@ -23,7 +24,7 @@ export type NetworkResponse<T> =
     data?: T;
 }
 
-export function SuccessCode(statusCode: HttpStatusCodeType)
+export function IsSuccessCode(statusCode: HttpStatusCodeType)
 {
     switch (statusCode)
     {
@@ -35,10 +36,10 @@ export function SuccessCode(statusCode: HttpStatusCodeType)
     return false;
 }
 
-export function MakeResponse<T>(res: express.Response, statusCode: number, success: boolean, message: string, data?: T)
+export function MakeResponse<T>(res: express.Response, statusCode: number, message: string, data?: T)
 {
     res.status(statusCode).json({
-        success, message, data
+        statusCode, message, data
     });
 }
 
@@ -60,12 +61,12 @@ export function BasicErrorHandler(err: any, req: express.Request, res: express.R
     if (err instanceof Error)
     {
         // res.status(400).json({ message: err.message, callStack: err.stack });
-        MakeResponse<string>(res, 400, false, err.message, err.stack);
+        MakeResponse<string>(res, HttpStatusCodeType.INTERNAL_SERVER_ERROR, err.message, err.stack);
     }
     else
     {
         // res.status(400).json({ message: 'unknown error', callStack: err.stack });
-        MakeResponse<string>(res, 400, false, 'unknown error', err.stack);
+        MakeResponse<string>(res, HttpStatusCodeType.INTERNAL_SERVER_ERROR, 'unknown error', err.stack);
     }
 }
 
