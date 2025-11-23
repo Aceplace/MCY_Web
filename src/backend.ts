@@ -56,18 +56,24 @@ export async function ConnectToDB(uri: string): Promise<void>
     }
 }
 
+export class ApiError extends Error {
+    constructor(
+        public status: HttpStatusCodeType,
+        public message: string,
+    )
+    {
+        super(message);
+    }
+}
+
 export function BasicErrorHandler(err: any, req: express.Request, res: express.Response, next: express.NextFunction)
 {
-    if (err instanceof Error)
-    {
-        // res.status(400).json({ message: err.message, callStack: err.stack });
+    if (err instanceof ApiError)
+        MakeResponse<string>(res, err.status, err.message, err.stack);
+    else if (err instanceof Error)
         MakeResponse<string>(res, HttpStatusCodeType.INTERNAL_SERVER_ERROR, err.message, err.stack);
-    }
     else
-    {
-        // res.status(400).json({ message: 'unknown error', callStack: err.stack });
         MakeResponse<string>(res, HttpStatusCodeType.INTERNAL_SERVER_ERROR, 'unknown error', err.stack);
-    }
 }
 
 export type BackEndConfig =
