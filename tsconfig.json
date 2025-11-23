@@ -18,7 +18,7 @@
     "experimentalDecorators": true,
 
     /* Module resolution */
-    "moduleResolution": "bundler",
+    "moduleResolution": "NodeNext",
     "isolatedModules": true,
     "moduleDetection": "force",
 
