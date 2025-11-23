@@ -10,7 +10,7 @@
 
     /* Language + target */
     "target": "ES2020",
-    "module": "ESNext",
+    "module": "NodeNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
 
     /* Decorators and class fields */
