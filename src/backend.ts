@@ -86,7 +86,7 @@ export const backEndConfig =
     basePath: '',
 }
 
-export async function FetchPostRequest<t_req, t_res>(endpoint: string, errorMsg: string, request: t_req): Promise<NetworkResponse<t_res>>
+export async function FetchPostRequest<t_req, t_res>(endpoint: string, request: t_req): Promise<NetworkResponse<t_res>>
 {
     const fullRoute = backEndConfig.basePath + endpoint;
 
@@ -102,13 +102,9 @@ export async function FetchPostRequest<t_req, t_res>(endpoint: string, errorMsg:
 
     const result: NetworkResponse<t_res> = await response.json();
     return result;
-    // if (!networkResponse.success)
-    //     throw new Error('errorMsg: ' + networkResponse.message);
-    //
-    // return networkResponse.data!;
 }
 
-export async function SimpleGetRequest<t_res>(endpoint: string, errorMsg: string): Promise<NetworkResponse<t_res>>
+export async function SimpleGetRequest<t_res>(endpoint: string): Promise<NetworkResponse<t_res>>
 {
     const fullRoute = backEndConfig.basePath + endpoint;
 
@@ -123,11 +119,6 @@ export async function SimpleGetRequest<t_res>(endpoint: string, errorMsg: string
 
     const result: NetworkResponse<t_res> = await response.json();
     return result;
-
-    // if (!networkResponse.success)
-    //     throw new Error('errorMsg: ' + networkResponse.message);
-
-    // return networkResponse.data!;
 }
 
 export const ErrorHandlerWrapper = (fn: express.RequestHandler) => {
