@@ -134,9 +134,6 @@ export async function SimpleGetRequest<t_res>(endpoint: string): Promise<Network
     {
         method: 'GET',
         credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
     });
 
     const result: NetworkResponse<t_res> = await response.json();
@@ -151,9 +148,6 @@ export async function SimpleGetRequestThrow<t_res>(endpoint: string): Promise<Ne
         {
             method: 'GET',
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
         });
 
     const result: NetworkResponse<t_res> = await response.json();
@@ -169,3 +163,40 @@ export const ErrorHandlerWrapper = (fn: express.RequestHandler) => {
         Promise.resolve(fn(req, res, next)).catch(next);
     };
 };
+
+export async function FetchPutRequestThrow<t_req, t_res>(endpoint: string, request: t_req): Promise<NetworkResponse<t_res>> {
+    const fullRoute = backEndConfig.basePath + endpoint;
+
+    const response = await fetch(fullRoute, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+    });
+
+    const result: NetworkResponse<t_res> = await response.json();
+    if (!IsSuccessCode(result.statusCode))
+        throw new Error(`${result.statusCode} ${result.message}`);
+
+    return result;
+}
+
+export async function SimpleDeleteRequestThrow<t_res>(endpoint: string): Promise<NetworkResponse<t_res>>
+{
+    const fullRoute = backEndConfig.basePath + endpoint;
+
+    const response = await fetch(fullRoute,
+        {
+            method: 'DELETE',
+            credentials: 'include',
+        });
+
+    const result: NetworkResponse<t_res> = await response.json();
+
+    if (!IsSuccessCode(result.statusCode))
+        throw new Error(`${result.statusCode} ${result.message}`);
+
+    return result;
+}
