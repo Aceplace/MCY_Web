@@ -200,3 +200,19 @@ export async function SimpleDeleteRequestThrow<t_res>(endpoint: string): Promise
 
     return result;
 }
+
+export function DownloadFromUrl(url: string, filename: string)
+{
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+export function OpenFromUrlInNewWindow(url: string)
+{
+    window.open(url, '_blank');
+}
