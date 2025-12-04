@@ -86,37 +86,54 @@ export const backEndConfig =
     basePath: '',
 }
 
-export async function FetchPostRequest<t_req, t_res>(endpoint: string, request: t_req): Promise<NetworkResponse<t_res>>
+export type FetchOptions = {
+    bearerToken?: boolean;
+    credentials?: boolean;
+}
+
+export async function FetchPostRequest<t_req, t_res>(endpoint: string, request: t_req, options: FetchOptions): Promise<NetworkResponse<t_res>>
 {
     const fullRoute = backEndConfig.basePath + endpoint;
 
-    const response = await fetch(fullRoute,
-    {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(request)
-    });
+    const headers: Record<string,string> = {
+        'Content-Type': 'application/json'
+    }
+
+    if (options.bearerToken)
+        headers['Authorization'] = 'Bearer ' + options.bearerToken;
+
+    const fetchSettings: RequestInit = {
+        method: 'POST', headers, body: JSON.stringify(request)
+    }
+
+    if (options.credentials)
+        fetchSettings.credentials = 'include'
+
+    const response = await fetch(fullRoute, fetchSettings);
 
     const result: NetworkResponse<t_res> = await response.json();
     return result;
 }
 
-export async function FetchPostRequestThrow<t_req, t_res>(endpoint: string, request: t_req): Promise<NetworkResponse<t_res>>
+export async function FetchPostRequestThrow<t_req, t_res>(endpoint: string, request: t_req, options: FetchOptions): Promise<NetworkResponse<t_res>>
 {
     const fullRoute = backEndConfig.basePath + endpoint;
 
-    const response = await fetch(fullRoute,
-        {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(request)
-        });
+    const headers: Record<string,string> = {
+        'Content-Type': 'application/json'
+    }
+
+    if (options.bearerToken)
+        headers['Authorization'] = 'Bearer ' + options.bearerToken;
+
+    const fetchSettings: RequestInit = {
+        method: 'POST', headers, body: JSON.stringify(request)
+    }
+
+    if (options.credentials)
+        fetchSettings.credentials = 'include'
+
+    const response = await fetch(fullRoute, fetchSettings);
 
     const result: NetworkResponse<t_res> = await response.json();
 
@@ -126,29 +143,49 @@ export async function FetchPostRequestThrow<t_req, t_res>(endpoint: string, requ
     return result;
 }
 
-export async function SimpleGetRequest<t_res>(endpoint: string): Promise<NetworkResponse<t_res>>
+export async function SimpleGetRequest<t_res>(endpoint: string, options: FetchOptions): Promise<NetworkResponse<t_res>>
 {
     const fullRoute = backEndConfig.basePath + endpoint;
 
-    const response = await fetch(fullRoute,
-    {
-        method: 'GET',
-        credentials: 'include',
-    });
+    const headers: Record<string,string> = {
+        'Content-Type': 'application/json'
+    }
+
+    if (options.bearerToken)
+        headers['Authorization'] = 'Bearer ' + options.bearerToken;
+
+    const fetchSettings: RequestInit = {
+        method: 'GET', headers
+    }
+
+    if (options.credentials)
+        fetchSettings.credentials = 'include'
+
+    const response = await fetch(fullRoute, fetchSettings);
 
     const result: NetworkResponse<t_res> = await response.json();
     return result;
 }
 
-export async function SimpleGetRequestThrow<t_res>(endpoint: string): Promise<NetworkResponse<t_res>>
+export async function SimpleGetRequestThrow<t_res>(endpoint: string, options: FetchOptions): Promise<NetworkResponse<t_res>>
 {
     const fullRoute = backEndConfig.basePath + endpoint;
 
-    const response = await fetch(fullRoute,
-        {
-            method: 'GET',
-            credentials: 'include',
-        });
+    const headers: Record<string,string> = {
+        'Content-Type': 'application/json'
+    }
+
+    if (options.bearerToken)
+        headers['Authorization'] = 'Bearer ' + options.bearerToken;
+
+    const fetchSettings: RequestInit = {
+        method: 'GET', headers
+    }
+
+    if (options.credentials)
+        fetchSettings.credentials = 'include'
+
+    const response = await fetch(fullRoute, fetchSettings);
 
     const result: NetworkResponse<t_res> = await response.json();
 
