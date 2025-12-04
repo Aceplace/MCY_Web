@@ -87,7 +87,7 @@ export const backEndConfig =
 }
 
 export type FetchOptions = {
-    bearerToken?: boolean;
+    bearerToken?: string;
     credentials?: boolean;
 }
 
