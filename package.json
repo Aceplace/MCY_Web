@@ -1,5 +1,5 @@
 {
-  "name": "mcy_web",
+  "name": "@myeiter/mcy-web",
   "version": "0.0.1",
   "exports": {
     ".": {
@@ -18,11 +18,16 @@
       "types": "./dist/backend.d.ts"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "main": "dist/core/core.js",
   "types": "dist/core/core.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build",
+    "prepublishOnly": "npm run build",
     "dev": "vite --config frontend_demo/vite.config.js"
   },
   "repository": {
@@ -30,8 +35,8 @@
     "url": "git+https://github.com/Aceplace/MCY_Web.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Michael Yeiter",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Aceplace/MCY_Web/issues"
   },
