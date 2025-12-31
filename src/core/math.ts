@@ -49,13 +49,19 @@ export function GetRandomInt(min: number, max: number): number
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function GetRandomIntWithAbsoluteValue(min: number, max: number): number {
-
+export function GetRandomIntWithAbsoluteValue(min: number, max: number): number
+{
     let result: number;
     if (GetRandomBool())
         result = GetRandomInt(min, max);
     else
         result = GetRandomInt(-max, -min);
 
+    return result;
+}
+
+export function V2ToString(value: V2)
+{
+    let result = `(${value.x}, ${value.y})`;
     return result;
 }

@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import {V2} from "../core/math";
 
 export enum KeyCode
@@ -146,117 +148,245 @@ export const KeyKeyCodeMap =
     "+": 68,
 }
 
-export class InputClass
+export enum MouseButton
 {
-    keysDown: Set<string> = new Set();
-    keysDownThisFrame: Array<string> = [];
-    keysUpThisFrame: Set<string> = new Set();
-    mouseDown = false;
-    mouseDownThisFrame = false;
-    mouseUpThisFrame = false;
-    mouseX: number = 0;
-    mouseY: number = 0;
+    LEFT,
+    MIDDLE,
+    RIGHT,
+}
 
-    constructor(target: HTMLElement | Window = window)
+export class Input
+{
+    _target: HTMLElement;
+    _keysDown: Set<string> = new Set();
+    _keysDownThisFrame: Array<string> = [];
+    _keysUpThisFrame: Set<string> = new Set();
+
+    _mouseDownLeft = false;
+    _mouseDownThisFrameLeft = false;
+    _mouseUpThisFrameLeft = false;
+    _mouseDownMiddle = false;
+    _mouseDownThisFrameMiddle = false;
+    _mouseUpThisFrameMiddle = false;
+    _mouseDownRight = false;
+    _mouseDownThisFrameRight = false;
+
+    _mouseUpThisFrameRight = false;
+    _mouseX: number = 0;
+    _mouseY: number = 0;
+    _previousMouseX: number = 0;
+    _previousMouseY: number = 0;
+    _dWheel: number = 0;
+
+    constructor(target: HTMLElement)
     {
-        target.addEventListener("keydown", (e: Event) =>
-        {
-            const keyboardEvent: KeyboardEvent = e as KeyboardEvent;
-
-            if (keyboardEvent.key === 'Tab') {
-                keyboardEvent.preventDefault();  // Stops default tabbing behavior
-            }
-
-            if (!keyboardEvent.repeat)
-            {
-                const key = keyboardEvent.key;
-                this.keysDownThisFrame.push(key);
-                this.keysDown.add(key);
-            }
-        });
-
-        target.addEventListener("keyup", (e: Event) =>
-        {
-            const key = (e as KeyboardEvent).key;
-            this.keysDown.delete(key);
-            this.keysUpThisFrame.add(key);
-        });
-
-        target.addEventListener("mousedown", (e: Event) =>
-        {
-            const mouseEvent = e as MouseEvent;
-            if (mouseEvent.button === 0 && !this.mouseDown)
-            {
-                this.mouseDown = true;
-                this.mouseDownThisFrame = true;
-            }
-        });
-
-        target.addEventListener("mouseup", (e: Event) =>
-        {
-            const mouseEvent = e as MouseEvent;
-            if (mouseEvent.button === 0)
-            {
-                this.mouseDown = false;
-                this.mouseUpThisFrame = true;
-            }
-        });
-
-        target.addEventListener('mousemove', (e) =>
-        {
-            const mouseEvent = e as MouseEvent;
-            this.mouseX = mouseEvent.clientX;
-            this.mouseY = mouseEvent.clientY;
-        });
+        this._target = target;
+        this._target.addEventListener("keydown", this._onKeyDown);
+        this._target.addEventListener("keyup", this._onKeyUp);
+        this._target.addEventListener("mousedown", this._onMouseDown);
+        this._target.addEventListener("mouseup", this._onMouseUp);
+        this._target.addEventListener('mousemove', this._onMouseMove);
+        this._target.addEventListener('contextmenu', this._onContext);
+        this._target.addEventListener('wheel', this._onWheel);
     }
 
-    ClearThisFramePresses(): void
+    _onKeyDown = (e: Event)=>
     {
-        this.keysDownThisFrame = [];
-        this.keysUpThisFrame.clear();
-        this.mouseDownThisFrame = false;
-        this.mouseUpThisFrame = false;
+        const keyboardEvent: KeyboardEvent = e as KeyboardEvent;
+
+        keyboardEvent.preventDefault();
+
+        if (!keyboardEvent.repeat)
+        {
+            const key = keyboardEvent.key;
+            this._keysDownThisFrame.push(key);
+            this._keysDown.add(key);
+        }
+    }
+
+    _onKeyUp = (e: Event)=>
+    {
+        const key = (e as KeyboardEvent).key;
+        this._keysDown.delete(key);
+        this._keysUpThisFrame.add(key);
+    }
+
+    _onMouseDown = (e: Event)=>
+    {
+        const mouseEvent = e as MouseEvent;
+        if (mouseEvent.button !== 0)
+        {
+            e.preventDefault();
+        }
+
+        if (mouseEvent.button === 0 && !this._mouseDownLeft)
+        {
+            this._mouseDownLeft = true;
+            this._mouseDownThisFrameLeft = true;
+        }
+        else if (mouseEvent.button === 1 && !this._mouseDownMiddle)
+        {
+            this._mouseDownMiddle = true;
+            this._mouseDownThisFrameMiddle = true;
+        }
+        else if (mouseEvent.button === 2 && !this._mouseDownRight)
+        {
+            this._mouseDownRight = true;
+            this._mouseDownThisFrameRight = true;
+        }
+    }
+
+    _onMouseUp = (e: Event)=>
+    {
+        const mouseEvent = e as MouseEvent;
+        if (mouseEvent.button === 0)
+        {
+            this._mouseDownLeft = false;
+            this._mouseUpThisFrameLeft = true;
+        }
+        else if (mouseEvent.button === 1)
+        {
+            this._mouseDownMiddle = false;
+            this._mouseUpThisFrameMiddle = true;
+        }
+        else if (mouseEvent.button === 2)
+        {
+            this._mouseDownRight = false;
+            this._mouseUpThisFrameRight = true;
+        }
+    }
+
+    _onMouseMove = (e: Event)=>
+    {
+        const mouseEvent = e as MouseEvent;
+        this._mouseX = mouseEvent.clientX;
+        this._mouseY = mouseEvent.clientY;
+    }
+
+    _onContext = (e: Event)=>
+    {
+        e.preventDefault();
+    }
+
+    _onWheel = (e: Event) =>
+    {
+        const wheelEvent = e as WheelEvent;
+        this._dWheel = wheelEvent.deltaY;
+    };
+
+    InputEndFrame(): void
+    {
+        this._keysDownThisFrame = [];
+        this._keysUpThisFrame.clear();
+        this._mouseDownThisFrameLeft = false;
+        this._mouseUpThisFrameLeft = false;
+        this._mouseDownThisFrameMiddle = false;
+        this._mouseUpThisFrameMiddle = false;
+        this._mouseDownThisFrameRight = false;
+        this._mouseUpThisFrameRight = false;
+        this._dWheel = 0;
+        this._previousMouseX = this._mouseX;
+        this._previousMouseY = this._mouseY;
+    }
+
+    MouseDelta(): V2
+    {
+        const dx = this._mouseX - this._previousMouseX;
+        const dy = this._mouseY - this._previousMouseY;
+        return { x: dx, y: dy};
+    }
+
+    MouseDeltaX(): number
+    {
+        const dx = this._mouseX - this._previousMouseX;
+        return dx;
+    }
+
+    MouseDeltaY(): number
+    {
+        const dy = this._mouseY - this._previousMouseY;
+        return dy;
     }
 
     KeyDown(key: KeyCode): boolean
     {
-        return this.keysDown.has(key);
+        return this._keysDown.has(key);
     }
 
     KeyDownThisFrame(key: KeyCode): boolean
     {
-        return this.keysDownThisFrame.includes(key);
+        return this._keysDownThisFrame.includes(key);
     }
 
     KeyUpThisFrame(key: KeyCode): boolean
     {
-        return this.keysUpThisFrame.has(key);
+        return this._keysUpThisFrame.has(key);
     }
 
-    MouseDown(): boolean
+    MouseDown(mouseButton: MouseButton): boolean
     {
-        return this.mouseDown;
+        if (mouseButton == MouseButton.LEFT)
+            return this._mouseDownLeft;
+        if (mouseButton == MouseButton.MIDDLE)
+            return this._mouseDownMiddle;
+        if (mouseButton == MouseButton.RIGHT)
+            return this._mouseDownRight;
+        return false;
     }
 
-    MouseDownThisFrame(): boolean
+    MouseDownThisFrame(mouseButton: MouseButton): boolean
     {
-        return this.mouseDownThisFrame;
+        if (mouseButton == MouseButton.LEFT)
+            return this._mouseDownThisFrameLeft;
+        if (mouseButton == MouseButton.MIDDLE)
+            return this._mouseDownThisFrameMiddle;
+        if (mouseButton == MouseButton.RIGHT)
+            return this._mouseDownThisFrameRight;
+        return false;
     }
 
-    MouseUpThisFrame(): boolean
+    MouseUpThisFrame(mouseButton: MouseButton): boolean
     {
-        return this.mouseUpThisFrame;
+        if (mouseButton == MouseButton.LEFT)
+            return this._mouseUpThisFrameLeft;
+        if (mouseButton == MouseButton.MIDDLE)
+            return this._mouseUpThisFrameMiddle;
+        if (mouseButton == MouseButton.RIGHT)
+            return this._mouseUpThisFrameRight;
+        return false;
     }
 
-    MousePosInCanvas(canvas: HTMLCanvasElement): V2
+    MousePos(): V2
     {
-        const canvasRect = canvas.getBoundingClientRect();
+        const elementRect = this._target.getBoundingClientRect();
 
-        const canvasMouseX: number = this.mouseX - canvasRect.left;
-        const canvasMouseY: number = this.mouseY - canvasRect.top;
+        const elementMouseX: number = this._mouseX - elementRect.left;
+        const elementMouseY: number = this._mouseY - elementRect.top;
 
-        return { x: canvasMouseX, y: canvasMouseY };
+        return { x: elementMouseX, y: elementMouseY };
+    }
+
+    Destroy()
+    {
+        this._target.removeEventListener("keydown", this._onKeyDown);
+        this._target.removeEventListener("keyup", this._onKeyUp);
+        this._target.removeEventListener("mousedown", this._onMouseDown);
+        this._target.removeEventListener("mouseup", this._onMouseUp);
+        this._target.removeEventListener("mousemove", this._onMouseMove);
+        this._target.removeEventListener('contextmenu', this._onContext);
+        this._target.removeEventListener('wheel', this._onContext);
+
+        this._keysDown.clear();
+        this._keysDownThisFrame.length = 0;
+        this._keysUpThisFrame.clear();
+        this._mouseDownLeft = false;
+        this._mouseDownThisFrameLeft = false;
+        this._mouseUpThisFrameLeft = false;
+        this._mouseDownMiddle = false;
+        this._mouseDownThisFrameMiddle = false;
+        this._mouseUpThisFrameMiddle = false;
+        this._mouseDownRight = false;
+        this._mouseDownThisFrameRight = false;
+        this._mouseUpThisFrameRight = false;
     }
 }
-
-export const InputWin = new InputClass();
